@@ -1,0 +1,57 @@
+- hosts: all
+  gather_facts: yes
+  become: yes
+  vars: 
+    ansible_become_password: developer  
+  
+  pre_tasks:
+  - name: install python
+    raw: test -e /usr/bin/python || (apt-get -y update && apt-get install -y python-pip)
+
+  tasks:
+#  - name: Update all packages to the latest version
+#    apt:
+#      upgrade: dist
+#      update_cache: yes
+  
+  - name: Make sure we have a 'wheel' group
+    group:
+      name: wheel
+      state: present
+
+  - name: Allow 'wheel' group to have passwordless sudo
+    lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%wheel'
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+      validate: 'visudo -cf %s'
+
+  - name: Grant passwordless sudo to developer
+    user: 
+      name: developer
+      groups: wheel,sudo 
+
+  - name: create deployer user and add sudo,wheel group
+    user: 
+      name: deployer
+      groups: wheel,sudo 
+      append: yes
+      generate_ssh_key: yes
+      system: yes
+      shell: /bin/bash 
+      state: present 
+      createhome: yes
+
+  post_tasks:
+
+  - name: Block incoming non-ssh traffic
+    ufw:
+      direction: incoming
+      policy: deny 
+
+  - name: Allow ssh connections and enable firewall
+    ufw:
+      rule: allow
+      name: OpenSSH
+      state: enabled   
