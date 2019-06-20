@@ -67,8 +67,8 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file":"./provision_ubuntu.yml",
-      "extra_arguments":["--extra-vars", "project_name=provision_ubuntu","-v"]
+      "playbook_file":"./ubuntu.yml",
+      "extra_arguments":["--extra-vars", "project_name=ubuntu","-v"]
     }
   ]
 }

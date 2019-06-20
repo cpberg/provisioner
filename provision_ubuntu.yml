@@ -1,4 +1,0 @@
-- include: "{{project_name}}/init.yml"
-#- include: "{{project_name}}/build.yml"
-#- include: "{{project_name}}/test.yml"
-#- include: "{{project_name}}/deploy.yml"

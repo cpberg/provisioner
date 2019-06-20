@@ -1,0 +1,2 @@
+- include: "{{project_name}}/init.yml"
+- include: "{{project_name}}/test.yml"

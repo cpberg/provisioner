@@ -1,0 +1,53 @@
+- hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    ansible_become_password: developer
+  tasks:
+
+# test port 22 is open
+  - name: Test ssh (port 22) is open to incoming connections
+    command: "nc -zv 127.0.0.1 22"
+
+#Check the resut of date and ensure set correctly
+  - name: Check timezone is set to UTC
+    shell: "date -u | cut -d ' ' -f5"
+    register: rc
+
+  - name: Testing...
+    fail:
+      msg: "Date is not set correctly!"
+    when: rc.stdout != "UTC"
+        
+
+#Check firewall is enabled
+  - name: Check firewall is enabled
+    shell: "ufw status | grep Status: | cut -d ' ' -f2"
+    register: rc
+  
+  - name: Testing...
+    fail:
+      msg: "Firewall is NOT enabled:"
+    when: rc.stdout != "active"
+    
+#Check deployer home exits
+  - name: Check deployer user and home exists
+    shell: "ls /home/ | grep deployer"
+    register: rc
+
+  - name: Testing...
+    fail:
+      msg: "User 'deployer' home does not exist!"
+    when: rc.stdout != "deployer"
+
+#  post_tasks:
+#
+#  - name: Sending Email Notifications
+#    mail:
+#      host: 127.0.0.1
+#      port: 2025
+#      subject: Ansible-report
+#      body: Hello, this is an e-mail. I hope you like it ;-)
+#      #from: christopherpberg@gmail.com
+#      to: christopherpberg@gmail.com
+#      delegate_to: localhost
